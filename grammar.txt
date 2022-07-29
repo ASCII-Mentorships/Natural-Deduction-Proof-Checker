@@ -1,0 +1,26 @@
+stmt_list       : stmt_list lab_stmt | lab_stmt
+
+lab_stmt        : LABEL stmt
+
+stmt            : SCOPE stmt | expr SQUARE_OPEN reason SQUARE_CLOSE | EOL | COMMENT
+
+________________________________________________________________________________________________
+
+expr            : NOT expr | expr OR expr | expr AND expr | expr THEN expr | expr IFF expr 
+                | VAR | ROUND_OPEN expr ROUND_CLOSE
+
+________________________________________________________________________________________________
+
+reason          : SQUARE_OPEN reason_list SQUARE_CLOSE EOL
+                | SQUARE_OPEN reason_list SQUARE_CLOSE COMMENT
+
+reason_list     : ASSN | HYPO | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE
+                | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL NUM
+
+expr_list       : expr_list COMMA NUM | NUM
+
+________________________________________________________________________________________________
+
+1. Labels
+2. Store proved results (subroutine)
+3. Syntax highlighting for VSC plug-in
