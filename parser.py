@@ -104,12 +104,12 @@ class PCParser(Parser):
     def reason_list(self,p):
         return  p.HYPO
 
-    @_(' BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE')
+    @_('BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE')
     def reason_list(self,p):
         return [ p.RULE,p.expr_list]
 
 
-    @_('  BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL NUM')
+    @_('BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL NUM')
     def reason_list(self,p):
         return [p.RULE,p.expr_list,p.NUM]
 
@@ -316,7 +316,6 @@ class PCParser(Parser):
         
                 #reduce scope
                 #remove prev scope labels from dict2
-                #create dict3 which stores key:scope value:list of labels
 
 
 
