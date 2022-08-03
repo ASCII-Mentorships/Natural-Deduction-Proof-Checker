@@ -142,7 +142,7 @@ class PCParser(Parser):
                     print("Incorrect number of reasons")
                     raise Exception("reason error")
                 reason_1 = dict2[reason_list[1]]
-                if(reason_1[0] != 'NOT' or reason_1[1][0] != 'NOT):
+                if(reason_1[0] != 'NOT' or reason_1[1][0] != 'NOT'):
                     print("Wrong reason type")
                     raise Exception("")
                 if(p.expr != reason_1[1][1]):
