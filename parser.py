@@ -13,8 +13,6 @@ class PCParser(Parser):
     dict2 = {}
     @_('LABEL stmt')
     def lab_stmt(self,p):
-        
-     
         return [p.LABEL , p.stmt]
 
     @_('stmt_list stmt')
@@ -94,10 +92,6 @@ class PCParser(Parser):
         # print("6")
         return p.reason_list
 
-    # @_('SQUARE_OPEN reason_list SQUARE_CLOSE ')
-    # def reason(self,p):
-    #     return p.reason_list
-
 
     ################# reason_list #########
 
@@ -137,35 +131,34 @@ class PCParser(Parser):
         list=[]
         reason_list=p.reason
         if(len(reason_list)==1 and reason_list[0]=="Hypothesis"):
-            return (p.expr, p.reason)
+            pass
         if(len(reason_list)==1 and reason_list[0]=="Assumption"):
             #check if scope increased
-            return (p.expr, p.reason)
+            pass
 
         if(len(reason_list) == 2):
             if(reason_list[0] == "~E"):
                 if(len(reason_list[1]) != 1):
                     print("Incorrect number of reasons")
                     raise Exception("reason error")
-                reason_1 = dict2[reason_list[1][0]]
+                reason_1 = dict2[reason_list[1]]
                 if(reason_1[0:2] != '~~'):
                     print("Wrong reason type")
                     raise Exception("")
                 if(p.expr != reason_1[2:]):
                     print("Wrong inference from reason")
                     raise Exception("")
-                # return 
  
  
             if(reason_list[0]=="&E"):
                 if(len(reason_list[1])!=1):
                     print("Incorrect number of reasons")
                     raise Exception("")
-                reason_1 = dict2[reason_list[1][0]]
-                if(reason_1[1] != '&'):
+                reason_1 = dict2[reason_list[1]]
+                if(reason_1[1] != 'AND'):
                     print("Wrong reason type")
                     raise Exception("")
-                if((p.expr != reason_1[0]) and (p.expr!=reason_1[2])):
+                if((p.expr != (reason_1[0] and reason_1[2]))):
                     print("Wrong inference from reason")
                     raise Exception("")
  
@@ -173,7 +166,7 @@ class PCParser(Parser):
                 if(len(reason_list[1])!=2):
                     print("Incorrect number of reasons")
                     raise Exception("")
-                if(p.expr[1] != '&'):
+                if(p.expr[1] != 'AND'):
                     print("Wrong introduction symbol")
                     raise Exception("")
 
@@ -184,36 +177,35 @@ class PCParser(Parser):
                 elif((reason_1 == p.expr[2]) and (reason_2==p.expr[0])):
                     pass
                 else:
-                    raise Exception("")
-                if(reason_2 != p.expr[2]):
                     print("Wrong inference from reason")
                     raise Exception("")
+
                
  
             if(reason_list[0]=="|E"):
-                if(len(reason_list[1])!=3):
+                if(len(reason_list[1])!=3):           #
                     print("Incorrect number of reasons")
                     raise Exception("")
                 reason_1 = dict2[reason_list[1][0]]
                 reason_2 = dict2[reason_list[1][1]]
                 reason_3 = dict2[reason_list[1][2]]
-                if(reason_1[1] != '|'):
+                if(reason_1[1] != 'OR'):
                     print("Wrong reason type")
                     raise Exception("") 
-                if(reason_2[1] != '>'):
+                if(reason_2[1] != 'THEN'):
                     print("Wrong reason type")
                     raise Exception("") 
-                if(reason_3[1] != '>'):
+                if(reason_3[1] != 'THEN'):
                     print("Wrong reason type")
                     raise Exception("") 
-                if(reason_2[0] == reason_1[0] and reason_3[0]==reason_1[3]):
+                if(reason_2[0] == reason_1[0] and reason_3[0] == reason_1[2]):
                     pass
-                elif(reason_2[0] == reason_1[3] and reason_3[0]==reason_1[0]):
+                elif(reason_2[0] == reason_1[2] and reason_3[0] == reason_1[0]):
                     pass
                 else:
                     print("Wrong reason type")
                     raise Exception("")     
-                if(p.expr != (reason_2[2]) or reason_2[2]!=reason_3[2]):
+                if(p.expr != (reason_2[2]) or reason_2[2] != reason_3[2]):
                     print("Wrong inference from reason")
                     raise Exception("")
  
@@ -222,12 +214,12 @@ class PCParser(Parser):
                 if(len(reason_list[1]) != 1):
                     print("Incorrect number of reasons")
                     raise Exception("")
-                if(p.expr[1] != '|'):
+                if(p.expr[1] != 'OR'):
                     print("Wrong introduction symbol")
                     raise Exception("")
     
-                reason_1 = dict2[reason_list[1][0]]
-                if((reason_1 != p.expr[0]) and (p.expr[2]!=reason_1)):
+                reason_1 = dict2[reason_list[1]]
+                if((reason_1 != p.expr[0]) and (reason_1 != p.expr[2])):
                     print("Wrong inference from reason")
                     raise Exception("")
  
@@ -239,7 +231,7 @@ class PCParser(Parser):
                 
                 reason_1 = dict2[reason_list[1][0]]
                 reason_2 = dict2[reason_list[1][1]]
-                if(reason_2[1] != '>'):
+                if(reason_2[1] != 'THEN'):
                     print("Wrong reason type")
                     raise Exception("")
                 if(reason_1[0] != reason_2[0]):
@@ -251,46 +243,61 @@ class PCParser(Parser):
  
  
             if(reason_list[0]=="<>E"):
-                if(len(reason_list[1])!=1):
-                    print("")
+                if(len(reason_list[1]) != 1):
+                    print("Incorrect number of reasons")
                     raise Exception("")
-                if(p.expr[0]==(dict2[reason_list[1][0]][0]) and p.expr[2]==(dict2[reason_list[1][0]][3])):
+                if(p.expr[1] != 'THEN'):
+                    print("Wrong expression introduction symbol")
+                    raise Exception("")
+                reason_1 = dict2[reason_list[1][0]]
+                if(reason_2[1] != 'IFF'):
+                    print("Wrong reason type")
+                    raise Exception("")
+                if(p.expr[0] == reason_1[0] and p.expr[2] == reason_1[2]):
                     pass
-                elif(p.expr[2]==(dict2[reason_list[1][0]][0]) and p.expr[0]==(dict2[reason_list[1][1]][0])):
+                elif(p.expr[2] == reason_1[0] and p.expr[0] == reason_1[0]):
                     pass
                 else:
-                    print("")
+                    print("Wrong inference from reason")
                     raise Exception("") 
-                if(p.expr[1]!=">"):
-                    print("")
-                    raise Exception("")
-                if(dict2[reason_list[1][0]][1]!="<" or dict2[reason_list[1][0]][2]!=">"):
-                    print("")
-                    raise Exception("")
+
                     
             if(reason_list[0]=="<>I"):
-                if(len(reason_list[1])!=2):
-                    print("")
+                if(len(reason_list[1]) != 2):
+                    print("Incorrect number of reasons")
                     raise Exception("")
-                if(p.expr[0]==(dict2[reason_list[1][0]][0]) and p.expr[3]==(dict2[reason_list[1][1]][0])):
+                if(p.expr[1] != 'THEN'):
+                    print("Wrong introduction symbol")
+                    raise Exception("")
+                reason_1 = dict2[reason_list[1][0]]
+                reason_2 = dict2[reason_list[1][1]]
+                if(reason_1[1] != 'THEN'):
+                    print("Wrong reason type")
+                    raise Exception("") 
+                if(reason_1[1] != 'THEN'):
+                    print("Wrong reason type")
+                    raise Exception("") 
+                if(reason_2[1] != 'THEN'):
+                    print("Wrong reason type")
+                    raise Exception("") 
+
+                if(p.expr[0] == reason_1[0] and p.expr[2] == reason_1[2]):
                     pass
-                elif(p.expr[3]==(dict2[reason_list[1][0]][0]) and p.expr[0]==(dict2[reason_list[1][1]][0])):
+                elif(p.expr[2] == reason_1[0] and p.expr[0] == reason_1[2]):
                     pass
                 else:
-                    print("")
-                    raise Exception("")      
-                if(p.expr[1]!="<" or p.expr[2]!=">"):
-                    print("")
-                    raise Exception("")
-                if(dict2[reason_list[1][0]][1]!=">" or dict2[reason_list[1][1]][1]!=">"):
-                    print("")
-                    raise Exception("")
-                if(dict2[reason_list[1][0]][0]!=dict2[reason_list[1][1]][2]):
-                    print("")
-                    raise Exception("")
-                if(dict2[reason_list[1][0]][2]!=dict2[reason_list[1][1]][0]):
-                    print("")
-                    raise Exception("")
+                    print("Wrong inference from reason")
+                    raise Exception("")  
+                if(p.expr[0] == reason_2[0] and p.expr[2] == reason_2[2]):
+                    pass
+                elif(p.expr[2] == reason_2[0] and p.expr[0] == reason_2[2]):
+                    pass
+                else:
+                    print("Wrong inference from reason")
+                    raise Exception("")  
+
+                
+
             
 
         if(len(reason_list)==3):
@@ -309,6 +316,7 @@ class PCParser(Parser):
         
                 #reduce scope
                 #remove prev scope labels from dict2
+                #create dict3 which stores key:scope value:list of labels
 
 
 
@@ -324,14 +332,14 @@ class PCParser(Parser):
                 reason_2 = dict2[reason_list[1][1]] 
                 reason_3 = dict2[reason_list[1][2]] 
 
-                if(reason_3[0] != '~'):
+                if(reason_3[0] != 'NOT'):
                     print("Wrong reason type")
                     raise Exception("")
-                if(reason_2 != reason_3[1:]):
+                if(reason_2 != reason_3[1]):
                     print("Wrong reason type")
                     raise Exception("")
 
-                if(p.expr[1:] != reason_1):
+                if(p.expr[1] != reason_1):
                     print("Wrong inference from reason")
                     raise Exception("")
                     
