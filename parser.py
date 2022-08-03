@@ -126,13 +126,12 @@ class PCParser(Parser):
     ###################################################### LOGIC ############################################################################
     #dict2={}
     
-    @_('expr SQUARE_OPEN reason SQUARE_CLOSE')
     def stmt(self,p):       
         list=[]
         reason_list=p.reason
-        if(len(reason_list)==1 and reason_list[0]=="Hypothesis"):
+        if(len(reason_list) == 1 and reason_list[0] == "Hypothesis"):
             pass
-        if(len(reason_list)==1 and reason_list[0]=="Assumption"):
+        if(len(reason_list) == 1 and reason_list[0] == "Assumption"):
             #check if scope increased
             pass
 
@@ -150,8 +149,8 @@ class PCParser(Parser):
                     raise Exception("")
  
  
-            if(reason_list[0]=="&E"):
-                if(len(reason_list[1])!=1):
+            if(reason_list[0] == "&E"):
+                if(len(reason_list[1]) != 1):
                     print("Incorrect number of reasons")
                     raise Exception("")
                 reason_1 = dict2[reason_list[1]]
@@ -162,8 +161,8 @@ class PCParser(Parser):
                     print("Wrong inference from reason")
                     raise Exception("")
  
-            if(reason_list[0]=="&I"):
-                if(len(reason_list[1])!=2):
+            if(reason_list[0] == "&I"):
+                if(len(reason_list[1]) != 2):
                     print("Incorrect number of reasons")
                     raise Exception("")
                 if(p.expr[1] != 'AND'):
@@ -172,9 +171,9 @@ class PCParser(Parser):
 
                 reason_1 = dict2[reason_list[1][0]]
                 reason_2 = dict2[reason_list[1][1]]
-                if((reason_1 == p.expr[0]) and (reason_2==p.expr[2]) ):
+                if((reason_1 == p.expr[0]) and (reason_2 == p.expr[2]) ):
                     pass
-                elif((reason_1 == p.expr[2]) and (reason_2==p.expr[0])):
+                elif((reason_1 == p.expr[2]) and (reason_2 == p.expr[0])):
                     pass
                 else:
                     print("Wrong inference from reason")
@@ -182,8 +181,8 @@ class PCParser(Parser):
 
                
  
-            if(reason_list[0]=="|E"):
-                if(len(reason_list[1])!=3):           #
+            if(reason_list[0] == "|E"):
+                if(len(reason_list[1]) != 3):           #
                     print("Incorrect number of reasons")
                     raise Exception("")
                 reason_1 = dict2[reason_list[1][0]]
@@ -210,7 +209,7 @@ class PCParser(Parser):
                     raise Exception("")
  
 
-            if(reason_list[0]=="|I"):
+            if(reason_list[0] == "|I"):
                 if(len(reason_list[1]) != 1):
                     print("Incorrect number of reasons")
                     raise Exception("")
@@ -224,7 +223,7 @@ class PCParser(Parser):
                     raise Exception("")
  
 
-            if(reason_list[0]==">E"):
+            if(reason_list[0] == ">E"):
                 if(len(reason_list[1])!=2):
                     print("Incorrect number of reasons")
                     raise Exception("")
@@ -273,10 +272,7 @@ class PCParser(Parser):
                 reason_2 = dict2[reason_list[1][1]]
                 if(reason_1[1] != 'THEN'):
                     print("Wrong reason type")
-                    raise Exception("") 
-                if(reason_1[1] != 'THEN'):
-                    print("Wrong reason type")
-                    raise Exception("") 
+                    raise Exception("")  
                 if(reason_2[1] != 'THEN'):
                     print("Wrong reason type")
                     raise Exception("") 
