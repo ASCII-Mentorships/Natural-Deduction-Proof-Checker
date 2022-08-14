@@ -10,6 +10,7 @@ Discrete Mathematics, Compiler Construction, (some) Development
 
 #### 1. Getting equipped
 - Understand **First Order Logic (FOL)** and the **Inference Rules**
+
 (CS'23 and 24 students must be familiar with this from the Discrete Structures course in 2-1).
 - **Compiler Construction** - Understand how programming languages are designed:
     - Components of a compiler (on a high-level): Scanner and Parser
@@ -24,13 +25,14 @@ Discrete Mathematics, Compiler Construction, (some) Development
     - Define the Context-free **Grammar**, the set of instructions that help in building the AST.
     - Design the **Validation Logic**- need to check if each step of the proof is inferred correctly using the appropriate inference rules and valid referenced expressions.
     - Build the **Parser** based on the CFG and validation-logic using SLY.
+    
     (Each step will be verified in the parser just as the statement is parsed.)
 - Incorporate proofs and rules with **Quantifiers**.
 - Incoporate **Generic Inferences** - create something like a library that stores snippets of proofs of commonly used derivations for added convenience in terms of removed redundancy, increased readability and improved efficiency of writing a proof.
 
 #### 3. VSCode Plug-in
 - Publish the proof checker as a VSCode extension.
-New to it too :/.. But [this](https://www.freecodecamp.org/news/making-vscode-extension/) makes it look straightforward :)
+New to it too :/ But [this](https://www.freecodecamp.org/news/making-vscode-extension/) makes it look straightforward :)
 
 ----
 
@@ -39,5 +41,10 @@ Aryan Gupta (Ph: 7506115192, Email: f20190017@goa.bits-pilani.ac.in / aryan.gupt
 
 #### Faculty Supervisor
 [Dr. Anup B Mathew](https://www.bits-pilani.ac.in/goa/anupm/profile)
+
+#### Contributors
+Harshit Samar (2020A7PS0964G)
+Saket B (2020A7PS0983G)
+Atharva Limaye (2020A7PS1721G)
 
 ----
