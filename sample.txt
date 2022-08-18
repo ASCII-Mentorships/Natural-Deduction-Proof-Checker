@@ -9,8 +9,8 @@
 5 - q [by ~E, using {8}]
 6 p > q [by >I, using {1,5}, cancel 1]
 
-- p > q [Assumption]
-- p [Hypothesis]
-- q [by >E, using {1,2}]
-- ~q [Hypothesis]
-~(p>q) [by ~I, using {1,3,4}, cancel 1]
+1 - p > q [Assumption]
+2 - p [Hypothesis]
+3 - q [by >E, using {1,2}]
+4 - ~q [Hypothesis]
+5 ~(p>q) [by ~I, using {1,3,4}, cancel 1]

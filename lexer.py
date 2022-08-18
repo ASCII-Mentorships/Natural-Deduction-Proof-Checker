@@ -3,16 +3,14 @@ from sly import Lexer
 class proofChecker(Lexer):
     
     # Set of token names.   
-    tokens = {EOS, COMMA, NUM, VAR, COMMENT, EOL, ROUND_OPEN, ROUND_CLOSE, CURLY_OPEN, CURLY_CLOSE, SQUARE_OPEN, SQUARE_CLOSE, NOT, OR, AND, THEN, IFF, SCOPE, RULE,BY,USING,CANCEL,ASSN,HYPO, LABEL}
+    tokens = {COMMA, VAR, COMMENT, EOL, ROUND_OPEN, ROUND_CLOSE, CURLY_OPEN, CURLY_CLOSE, SQUARE_OPEN, SQUARE_CLOSE, NOT, OR, AND, THEN, IFF, SCOPE, RULE,BY,USING,CANCEL,ASSN,HYPO, LABEL}
 
     # String containing ignored characters between tokens
     ignore = ' \t'
 
     # Regular expression rules for tokens
-    EOS = r';'
     COMMA = r','
-    LABEL = r'^l\d+'
-    NUM = r'[0-9]+'
+    LABEL = r'[0-9]+'
 
     VAR = r'[a-zA-Z][a-zA-Z0-9_]*'
     

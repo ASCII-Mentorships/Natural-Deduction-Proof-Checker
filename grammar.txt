@@ -1,8 +1,8 @@
-stmt_list       : stmt_list stmt | stmt
+stmt_list       : stmt_list lab_stmt | lab_stmt
 
+lab_stmt        : LABEL stmt | EOL | COMMENT
 
-
-stmt            : LABEL SCOPE stmt | expr SQUARE_OPEN reason SQUARE_CLOSE | EOL | COMMENT
+stmt            : SCOPE stmt | expr SQUARE_OPEN reason SQUARE_CLOSE
 
 ________________________________
 
@@ -11,13 +11,11 @@ expr            : NOT expr | expr OR expr | expr AND expr | expr THEN expr | exp
 
 ________________________________
 
-reason          : reason_list EOL
-                | reason_list COMMENT
 
-reason_list     : ASSN | HYPO | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE
+reason          : ASSN | HYPO | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE
                 | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL NUM
 
-expr_list       : expr_list COMMA NUM | NUM
+expr_list       : expr_list COMMA LABEL | LABEL
 
 ________________________________________________________________________________________________
 
