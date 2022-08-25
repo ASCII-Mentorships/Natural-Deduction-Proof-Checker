@@ -407,6 +407,10 @@ class PCParser(Parser):
                     self.is_assn.pop(self.valid_expr[-1])
                     self.lab_expr.pop(self.valid_expr[-1])
                     self.valid_expr.pop()
+                
+                if self.is_cancel_bool == False:
+                    print("Invalid cancellation")
+                    raise Exception("")
 
             return curr_expr
 
@@ -417,7 +421,7 @@ class PCParser(Parser):
 if __name__ == '__main__':
     lexer = proofChecker()
     parser = PCParser()
-    fname = "sample.txt"
+    fname = "test2.txt"
     with open(fname, 'r') as fileh:
         lines = fileh.readlines()
         line_count = 1;
