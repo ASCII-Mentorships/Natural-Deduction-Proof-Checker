@@ -1,5 +1,6 @@
-from cProfile import label
-from platform import java_ver
+# from cProfile import VAR
+# from platform import java_ver
+from turtle import bye
 from sly import Parser
 from lexer import proofChecker
 import pickle, sys
@@ -17,10 +18,27 @@ class PCParser(Parser):
 
     lab_expr = {}
     valid_expr = []
-    hypo = {}
+    infer = []
     is_assn_bool = False
     is_cancel_bool = False
     is_assn = {}
+    assign_l = {}
+
+    thmList = {}
+    hypo_list_dict = {}
+
+    thmList["~E"] = [{"h1":["NOT", ["NOT", "p"]]},["p"]]
+    thmList["~I"] = [{"h1":["p"], "h2":["q"], "h3":["NOT", "q"]},["NOT", "p"]]
+    thmList["&E"] = [{"h1":["p","AND","q"]},["p"]]
+    thmList["&I"] = [{"h1":["p"], "h2":["q"]},["p","AND","q"]]
+    thmList["|E"] = [{"h1":["p","OR","q"], "h2":["p","THEN","r"], "h3":["q","THEN","r"]},["r"]]
+    thmList["|I"] = [{"h1":["p"]},["p","OR","q"]]
+    thmList[">E"] = [{"h1":["p","THEN","q"], "h2":["p"]},["q"]]
+    thmList[">I"] = [{"h1":["p"], "h2":["q"]},["p","THEN","q"]]
+    thmList["<>E"] = [{"h1":["p<>q"]},["p","THEN","q"]]
+    thmList["<>I"] = [{"h1":["p>q"], "h2":["q>p"]},["p","IFF","q"]]
+
+    
 
     @_('stmt_list lab_stmt')
     def stmt_list(self,p):
@@ -40,11 +58,11 @@ class PCParser(Parser):
     def lab_stmt(self,p):
         return p
 
-    @_('LABEL stmt')
+    @_('VAR stmt')
     def lab_stmt(self,p):
-        self.lab_expr[p.LABEL] = p.stmt
+        self.lab_expr[p.VAR] = p.stmt
 
-        # print("enter label stmt, scope...", self.t_scp, self.g_scp)
+        # print("enter VAR stmt, scope...", self.t_scp, self.g_scp)
         if self.is_assn_bool:
             if self.t_scp != self.g_scp+1:
                 print("Scope of assumption should be one more than scope of prev. statement")
@@ -57,13 +75,13 @@ class PCParser(Parser):
             print("Scope of non-assumption-related statement should be same as scope of prev. statement")
             raise Exception("Scope Error")
 
-        self.is_assn[p.LABEL] = self.is_assn_bool
+        self.is_assn[p.VAR] = self.is_assn_bool
         self.is_assn_bool = False
         self.is_cancel_bool = False
-        self.valid_expr.append(p.LABEL)
+        self.valid_expr.append(p.VAR)
         self.g_scp = self.t_scp
         self.t_scp = 0
-        # print("exit label stmt, scope...", self.t_scp, self.g_scp)
+        # print("exit VAR stmt, scope...", self.t_scp, self.g_scp)
 
     @_('SCOPE stmt')
     def stmt(self,p):
@@ -85,7 +103,7 @@ class PCParser(Parser):
         return [p.expr0, 'AND' , p.expr1]
 
     @_('expr THEN expr')
-    def expr(self,p):
+    def expr(self,p):  
         return [p.expr0, 'THEN' , p.expr1]
     
     @_('expr IFF expr')
@@ -114,21 +132,88 @@ class PCParser(Parser):
     def reason(self,p):
         return [p.RULE, p.expr_list]
 
-    @_('BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL LABEL')
+    @_('BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL VAR')
     def reason(self,p):
-        return [p.RULE, p.expr_list, p.LABEL]
+        return [p.RULE, p.expr_list, p.VAR]
+
+    @_('BY VAR COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA WITH CURLY_OPEN assign_list CURLY_CLOSE')
+    def reason(self,p):
+        self.assign_l[p.VAR] = p.assign_list
+        return [p.VAR, p.expr_list, p.assign_list]
+
+    @_('assign_list COMMA assign')
+    def assign_list(self,p):
+        assign_dict = p.assign_list
+        resolved_assign = p.assign
+        assign_dict[resolved_assign[0]] = resolved_assign[1]
+        return assign_dict
+    
+    @_('assign')
+    def assign_list(self,p):
+        return p.assign
+
+    @_('VAR COLON expr')
+    def assign(self,p):
+        return [p.VAR, p.expr]
 
     ############### expr_list ###############
 
-    @_('expr_list COMMA LABEL')
+    @_('expr_list COMMA VAR')
     def expr_list(self,p):
         lab_list = p.expr_list
-        lab_list.append(p.LABEL)
+        lab_list.append(p.VAR)
         return lab_list
 
-    @_('LABEL')
+    @_('VAR')
     def expr_list(self,p):
-        return [p.LABEL]
+        return [p.VAR]
+
+    
+
+    @_('thm PROOF EOL')
+    def thm_list(self,p):
+        return p
+
+    @_('thm thm_list')
+    def thm_list(self,p):
+        theorem_list = p.thm_list
+        theorem_list.append(p.thm)
+        return theorem_list 
+
+    @_('THM VAR COLON hypo_list INFERS expr EOL')
+    def thm(self,p):
+        self.thmList[p.VAR] = [p.hypo_list,p.expr]
+        return [p.hypo_list, p.infr]
+
+
+    @_('hypo_list COMMA hypo')
+    def hypo_list(self,p):
+        hypo_dict = p.hypo_list
+        resolved_hypo = p.hypo
+        hypo_dict[resolved_hypo[0]] = resolved_hypo[1]
+        self.hypo_list_dict[resolved_hypo[1]] = True
+        return hypo_dict
+
+
+    @_('hypo')
+    def hypo_list(self,p):
+        return p.hypo
+
+    @_('VAR COLON expr')
+    def hypo(self,p):
+        return [p.VAR, p.expr]
+    
+    @_('infr_list COMMA infr')
+    def infr_list(self,p):
+        return [p.infr_list]
+
+    @_('infr')
+    def infr_list(self,p):
+        return p.infr
+
+    @_('VAR COLON expr')
+    def infr(self,p):
+        return [p.VAR, p.expr]
     
     ################################ LOGIC ################################
     
@@ -137,286 +222,102 @@ class PCParser(Parser):
         
         curr_expr = p.expr
         reason_list = p.reason
+
+
+########################################################
+        def assignment(cur_hypo, cur_assign, m):
+            if(len(cur_hypo) == 1):        
+                if(m.get(cur_hypo[0]) == None):
+                    m[cur_hypo[0]] = cur_assign
+                elif(m.get(cur_hypo[0]) != cur_assign):
+                    return False
+                return True
+
+            if(len(cur_hypo) == 2):
+                if(cur_hypo[0] != cur_assign[0]):
+                    return False
+                else:
+                    return assignment(cur_hypo[1], cur_assign[1])
+
+            if(len(cur_hypo) == 3):
+                if(cur_hypo[1] != cur_assign[1]):
+                    return False
+                else:
+                    return assignment(cur_hypo[0], cur_assign[0]) or assignment(cur_hypo[2], cur_assign[2])
         
-        # FUNCTION DEFINITIONS
+            return False # due to different lengths
 
-        def notElimination(curr_expr,reason_i):
-            return (curr_expr == reason_i)
+        def inference(cur_infer, cur_expr, m):
+            if(len(cur_infer) == 1):        
+                if(m.get(cur_infer[0]) == None or m.get(cur_infer[0]) != cur_expr):
+                    return False
+                return True
 
-        def andElimination(curr_expr,reason_i):
-            return (curr_expr == reason_i)
+            if(len(cur_infer) == 2):
+                if(cur_infer[0] != cur_expr[0]):
+                    return False
+                else:
+                    return assignment(cur_infer[1], cur_expr[1])
 
-        def andIntroduction(curr_expr,reason_1,reason_2):
-            return ((reason_1 == curr_expr[0]) and (reason_2 == curr_expr[2]))
+            if(len(cur_infer) == 3):
+                if(cur_infer[1] != cur_expr[1]):
+                    return False
+                else:
+                    return assignment(cur_infer[0], cur_expr[0]) or assignment(cur_infer[2], cur_expr[2])
+
+            return False
+
+        def theoremChecks():
+            cur_thm = reason_list[0]
+            if(len(reason_list[1]) != len(self.thmList[cur_thm][0])):
+                print("Incorrect number of reasons")
             
-        def orElimination(curr_expr,reason_1,reason_2,reason_3):
-            if not (reason_1[1] == 'OR' and reason_2[1] == 'THEN' and reason_3[1] == 'THEN') and \
-                   (reason_2[0] == reason_1[0] and reason_3[0] == reason_1[2] and reason_2[2] == reason_3[2]):
-                return 0
-            return (1 + int(reason_3[2] == curr_expr))
+            if(len(reason_list[1]) != len(self.assign_l[cur_thm])):
+                print("Incorrect number of Assignments")
 
-        def orIntroduction(curr_expr,reason_1):
-            return (reason_1 == curr_expr[0] or reason_1 != curr_expr[2])
-
-        def thenElimination2(curr_expr,reason_1,reason_2):
-            if not (len(reason_1) == 1 and len(reason_2) == 3 and \
-                    reason_2[1] == 'THEN' and reason_1[0] == reason_2[0]):
-                return 0
-            return (1 + int(curr_expr == reason_2[2]))
-
-        def iffElimination(curr_expr,reason_1):
-            if not (reason_1[1] == 'IFF'):
-                return 0
-            return 1 + int(curr_expr[1] == 'THEN' and \
-                        ((curr_expr[0] == reason_1[0] and curr_expr[2] == reason_1[2]) or \
-                         (curr_expr[2] == reason_1[0] and curr_expr[0] == reason_1[2])))
-
-        def iffIntroduction(curr_expr, reason_1, reason_2):
-            if not (reason_1[1] == 'THEN' and reason_2[1] != 'THEN' and \
-                    reason_1[0] == reason_2[2] and reason_1[2] == reason_2[0]):
-                return 0
-            return (1 + int(curr_expr[0] == reason_1[0] and curr_expr[2] == reason_1[2] and \
-                    curr_expr[0] == reason_2[2] and curr_expr[2] == reason_2[0]))
-
-        def thenIntroduction(curr_expr, reason_1, reason_2, assn_lab):
-            return int(self.is_assn[assn_lab] and curr_expr[0] == reason_1 and curr_expr[2] == reason_2)
+            m={}
             
-        def notIntroduction(curr_expr, reason_1, reason_2, reason_3, assn_lab):
-            if not (self.is_assn[assn_lab] and len(reason_3) == 2 and reason_3[0] == 'NOT' and reason_2 == reason_3[1]):
-                return 0
-            return (1 + int(len(curr_expr) == 2 and curr_expr[0] == 'NOT' and reason_1 == curr_expr[1]))
+            for x in self.assign_l[cur_thm][0] : # for each theorem key
+                if(self.thmList[cur_thm][0].get(x)==None): # thm[cur_thm][0] gives first element of list which is dict
+                    raise Exception
+                    print("Hypo does not exist")
+                cur_hypo = self.thmList[cur_thm][0].get(x) # p>q
+                cur_assign = self.assign_l[cur_thm].get(x) #(a<>b)>(c>d)
+
+                if(assignment(cur_hypo, cur_assign, m) == False):
+                    raise Exception
+                    print("Wrong assignment")
+                    return False
+
+            cur_infer = self.thmList[cur_thm][1]   # q
+            if(inference(cur_infer, curr_expr, m) == False): # curr_expr = c > d
+                    raise Exception
+                    print("Wrong inference")
+            
+            return True
 
         try:
         
             # IF LEN = 1
-            if (len(reason_list) == 1):
+            if (reason_list[0] == "Assumption"):
+                self.is_assn_bool = True
 
-                # if (reason_list[0] == "Hypothesis"):
-                    # if curr_expr not in self.hypo:
-                    #     print("Expression not a hypothesis")
-                    #     raise Exception("Invalid Hypothesis")
-            
-                if (reason_list[0] == "Assumption"):
-                    self.is_assn_bool = True
+            if (reason_list[1] == "Hypothesis"):
+                if self.hypo_list_dict[curr_expr] == None:
+                    print("Not a valid hypothesis")
+                    raise Exception
 
-            #IF LEN=2
-            if (len(reason_list) == 2):
+            ########################################################
 
-                if (reason_list[0] == "~E"):
-
-                    if (len(reason_list[1]) != 1):
-                        print("Incorrect number of reasons")
-                        raise Exception("reason error")
-
-                    reason_1 = self.lab_expr[reason_list[1][0]]
+            if(theoremChecks() == False):
+                print("Wrong Theorem Usage")
+                raise Exception
                 
-                    if (reason_1[0] != 'NOT' or reason_1[1][0] != 'NOT'):
-                        print("Wrong expr(s) used")
-                        raise Exception("")
-                    
-                    if not notElimination(curr_expr,reason_1[1][1]):
-                        print("Wrong inference from reason")
-                        raise Exception("")
-    
-                if (reason_list[0] == "&E"):
-                    
-                    if (len(reason_list[1]) != 1):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-
-                    if (reason_1[1] != 'AND'):
-                        print("Wrong expr(s) used")
-                        raise Exception("")
-                    
-                    if not (andElimination(curr_expr,reason_1[0]) or andElimination(curr_expr,reason_1[2])):
-                        print("Wrong inference from reason")
-                        raise Exception("")
-    
-                if (reason_list[0] == "&I"):
-
-                    if (len(reason_list[1]) != 2):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-
-                    if (curr_expr[1] != 'AND'):
-                        print("Wrong Introduction symbol")
-                        raise Exception("")
-                    
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    reason_2 = self.lab_expr[reason_list[1][1]]
-
-                    if not (andIntroduction(curr_expr,reason_1,reason_2) or andIntroduction(curr_expr,reason_2,reason_1)):
-                        print("Wrong inference from reason")
-                        raise Exception("")
-
-                if (reason_list[0] == "|E"):
-
-                    if (len(reason_list[1]) != 3):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-                    
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    reason_2 = self.lab_expr[reason_list[1][1]]
-                    reason_3 = self.lab_expr[reason_list[1][2]]
-
-                    ma = max(orElimination(curr_expr,reason_1,reason_2,reason_3),
-                             orElimination(curr_expr,reason_1,reason_3,reason_2),
-                             orElimination(curr_expr,reason_2,reason_1,reason_3),
-                             orElimination(curr_expr,reason_2,reason_3,reason_1),
-                             orElimination(curr_expr,reason_3,reason_2,reason_1),
-                             orElimination(curr_expr,reason_3,reason_1,reason_2))
-
-                    if ma == 0:
-                        print("Wrong reason list")
-                        raise Exception("")
-                    elif ma == 1:
-                        print(" Wrong inference from reason")
-                        raise Exception("")
-
-                if (reason_list[0] == "|I"):
-
-                    if (len(reason_list[1]) != 1):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-
-                    if (curr_expr[1] != 'OR'):
-                        print("Wrong introduction symbol")
-                        raise Exception("")
-                    
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    
-                    if not (orIntroduction(curr_expr,reason_1)):
-                        print(" Wrong inference from reason")
-    
-                if (reason_list[0] == ">E"):
-
-                    if (len(reason_list[1]) != 2):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-                    
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    reason_2 = self.lab_expr[reason_list[1][1]]
-                        
-                    ma = max(thenElimination2(curr_expr,reason_1,reason_2),
-                             thenElimination2(curr_expr,reason_2,reason_1))
-                    
-                    if ma == 0:
-                        print("Wrong reason list")
-                        raise Exception("")
-                    elif ma == 1:
-                        print("Wrong inference from reason")
-                        raise Exception("")
-    
-                if (reason_list[0]=="<>E"):
-
-                    if (len(reason_list[1]) != 1):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    
-                    ma = (iffElimination(curr_expr,reason_1))
-
-                    if ma == 0:
-                        print("Wrong reason list")
-                        raise Exception("")
-                    elif ma == 1:
-                        print(" Wrong inference from reason")
-                        raise Exception("")
-            
-                if (reason_list[0]=="<>I"):
-
-                    if (len(reason_list[1]) != 2):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-
-                    if (curr_expr[1] != 'THEN'):
-                        print("Wrong introduction symbol")
-                        raise Exception("")
-
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    reason_2 = self.lab_expr[reason_list[1][1]]
-
-                    ma = max(iffIntroduction(curr_expr,reason_1,reason_2),
-                             iffIntroduction(curr_expr,reason_2,reason_1))
-                    
-                    if ma == 0:
-                        print("Wrong reason type")
-                        raise Exception("")
-                    elif ma == 1:
-                        print("Wrong inference from reason")
-                        raise Exception("")
-
-            # IF LEN=3
-            if (len(reason_list) == 3):
-
-                if (reason_list[0]==">I"):
-                    if (len(reason_list[1]) != 2):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-
-                    if (curr_expr[1] != 'THEN'):
-                        print("Wrong introduction symbol")
-                        raise Exception("")
-                    
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    reason_2 = self.lab_expr[reason_list[1][1]]
-
-                    ma = max(thenIntroduction(curr_expr,reason_1,reason_2,reason_list[1][0]),
-                             thenIntroduction(curr_expr,reason_2,reason_1,reason_list[1][1]))
-                    if ma == 0:
-                        print("Wrong inference from reason")
-                        raise Exception("")
-
-                if (reason_list[0]=="~I"):
-
-                    if (len(reason_list[1]) != 3):
-                        print("Incorrect number of reasons")
-                        raise Exception("")
-                    
-                    if (curr_expr[0] != 'NOT'):
-                        print("Wrong introduction symbol")
-                        raise Exception("")
-                    
-                    reason_1 = self.lab_expr[reason_list[1][0]]
-                    reason_2 = self.lab_expr[reason_list[1][1]] 
-                    reason_3 = self.lab_expr[reason_list[1][2]]
-
-                    ma = max(notIntroduction(curr_expr,reason_1,reason_2,reason_3,reason_list[1][0]),
-                             notIntroduction(curr_expr,reason_1,reason_3,reason_2,reason_list[1][0]),
-                             notIntroduction(curr_expr,reason_2,reason_3,reason_1,reason_list[1][1]),
-                             notIntroduction(curr_expr,reason_2,reason_1,reason_3,reason_list[1][1]),
-                             notIntroduction(curr_expr,reason_3,reason_2,reason_1,reason_list[1][2]),
-                             notIntroduction(curr_expr,reason_3,reason_1,reason_2,reason_list[1][2]))
-                    if ma == 0:
-                        print("Wrong reason type")
-                        raise Exception("")
-                    elif ma == 1:
-                        print("Wrong inference from reason")
-                        raise Exception("")
-
-                while len(self.valid_expr) != 0 and not self.is_cancel_bool:
-                    if self.is_assn[self.valid_expr[-1]]:
-                        if self.valid_expr[-1] == reason_list[2]:
-                            self.is_cancel_bool = True
-                        else:
-                            print("Only the most recent active assumption can be cancelled")
-                            raise Exception("")
-                    self.is_assn.pop(self.valid_expr[-1])
-                    self.lab_expr.pop(self.valid_expr[-1])
-                    self.valid_expr.pop()
-                
-                if self.is_cancel_bool == False:
-                    print("Invalid cancellation")
-                    raise Exception("")
 
             return curr_expr
 
-        except KeyError:
-            print("Invalid Label referenced")
-            raise Exception("Invalid LABEL")
+        except:
+            raise Exception
 
 if __name__ == '__main__':
     lexer = proofChecker()
@@ -424,7 +325,7 @@ if __name__ == '__main__':
     fname = "test2.txt"
     with open(fname, 'r') as fileh:
         lines = fileh.readlines()
-        line_count = 1;
+        line_count = 1
         for line in lines:
             try:
                 result = parser.parse(lexer.tokenize(line))
