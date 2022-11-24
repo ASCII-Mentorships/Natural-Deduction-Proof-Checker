@@ -3,7 +3,7 @@ from sly import Lexer
 class proofChecker(Lexer):
     
     # Set of token names.   
-    tokens = {COMMA, VAR, COMMENT, EOL, ROUND_OPEN, ROUND_CLOSE, CURLY_OPEN, CURLY_CLOSE, SQUARE_OPEN, SQUARE_CLOSE, NOT, OR, AND, THEN, IFF, SCOPE, RULE,BY,USING,CANCEL,ASSN,HYPO, QED,PROOF,THM,WITH,COLON,INFERS}
+    tokens = {COMMA, VAR, COMMENT, EOL, ROUND_OPEN, ROUND_CLOSE, CURLY_OPEN, CURLY_CLOSE, SQUARE_OPEN, SQUARE_CLOSE, NOT, OR, AND, THEN, IFF, SCOPE, RULE, BY, USING, ASSN, HYPO, QED, COLON, INFERS, PROVE, ADMIT}
 
     # String containing ignored characters between tokens
     ignore = ' \t'
@@ -24,25 +24,22 @@ class proofChecker(Lexer):
     SQUARE_CLOSE = r'\]'
     RULE = r'(~E|~I|&E|&I|\|E|\|I|>E|>I|<>E|<>I)'
     NOT = r'(\~|\!)'
+    INFERS = r'\|-'
     OR = r'\|'
     AND = r'\&'
     THEN = r'\>'
     IFF = r'\<\>'
     SCOPE = r'-'
     COLON = r':'
-    INFERS = r'\|-'
-     # Base ID rule
+    # Base ID rule
     
 
     # Special cases
     VAR['by'] = BY
     VAR['using'] = USING
-    VAR['cancel'] = CANCEL
     VAR['Assumption'] = ASSN
     VAR['Hypothesis'] = HYPO
-    # VAR['[a-n]'] = LABEL
-    VAR['with'] = WITH      #change
-    VAR['proof'] = PROOF
-    VAR['thm'] = THM
-    VAR['qed']= QED
+    VAR['Qed'] = QED
+    VAR['Prove'] = PROVE
+    VAR['Admit'] = ADMIT
     

@@ -1,48 +1,20 @@
-thm_list        : thm PROOF EOL | thm thm_list
+line            : ADMIT thm | PROVE thm | VAR stmt | QED EOL | COMMENT EOL | EOL
+________________________________
 
-thm             : THM VAR COLON hypo_list INFERS infr_list EOL
+thm             : VAR COLON hypo_list INFERS infr_list EOL
+                | RULE COLON hypo_list INFERS infr_list EOL
 
-stmt_list       : stmt_list lab_stmt | lab_stmt
-
-lab_stmt        : VAR stmt | EOL | COMMENT 
+hypo_list       : hypo_list COMMA VAR COLON expr | VAR COLON expr
+________________________________
 
 stmt            : SCOPE stmt | expr SQUARE_OPEN reason SQUARE_CLOSE
 
+reason          : ASSN | HYPO VAR
+                | BY VAR COMMA USING CURLY_OPEN assign_list CURLY_CLOSE
+                | BY RULE COMMA USING CURLY_OPEN assign_list CURLY_CLOSE
+
+assign_list     : assign_list COMMA VAR COLON VAR | VAR COLON VAR
 ________________________________
 
 expr            : NOT expr | expr OR expr | expr AND expr | expr THEN expr | expr IFF expr 
                 | VAR | ROUND_OPEN expr ROUND_CLOSE
-
-________________________________
-
-
-reason          : ASSN | HYPO | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE
-                | BY RULE COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA CANCEL NUM |
-                 BY VAR COMMA USING CURLY_OPEN expr_list CURLY_CLOSE COMMA WITH CURLY_OPEN assign_list CURLY_CLOSE
-                
-                
-                  
-
-assign_list     : assign_list COMMA VAR COLON VAR | assign
-
-assign          : VAR COLON expr
-
-
-
-expr_list       : expr_list COMMA VAR | expr
-
-hypo_list       : hypo COMMA hypo_list | hypo
-
-hypo            : VAR COLON expr
-
-
-infer_list       : hypo COMMA hypo_list | infer
-
-infer            : VAR COLON expr
-
-
-________________________________________________________________________________________________
-
-1. VAR
-2. Store proved results (subroutine)
-3. Syntax highlighting for VSC plug-in
