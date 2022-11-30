@@ -29,7 +29,7 @@ class PCParser(Parser):
         p.line
         return p
 
-    ############# line ###############
+    ################################ types of lines ################################
     
     @_('ADMIT thm')
     def line(self,p): # admit_thm
@@ -104,6 +104,14 @@ class PCParser(Parser):
     def thm(self,p):
         return [p.VAR, p.hypo_list, p.expr]
 
+    @_('RULE COLON INFERS expr EOL')
+    def thm(self,p):
+        return [p.RULE, {}, p.expr]
+
+    @_('VAR COLON INFERS expr EOL')
+    def thm(self,p):
+        return [p.VAR, {}, p.expr]
+    
     @_('hypo_list COMMA VAR COLON expr')    # hypo: "VAR COLON expr"
     def hypo_list(self,p):
         hypo_dict = p.hypo_list
@@ -266,7 +274,7 @@ class PCParser(Parser):
 if __name__ == '__main__':
     lexer = proofChecker()
     parser = PCParser()
-    fname = "sample.txt"
+    fname = "sample.ndp"
     with open(fname, 'r') as fileh:
         lines = fileh.readlines()
         line_count = 1

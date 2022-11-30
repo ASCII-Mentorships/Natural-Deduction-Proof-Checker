@@ -1,0 +1,43 @@
+{
+  "name": "natdedproofs",
+  "displayName": "Nat-Ded-Proofs",
+  "description": "",
+  "version": "0.0.1",
+  
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+
+  "categories": [
+    "Programming Languages"
+  ],
+  
+  "contributes": {
+		"languages": [
+			{
+				"id": "natdedproofs",
+				"aliases": [
+					"NDP-Basic",
+					"ndpbasic"
+				],
+				"extensions": [
+					".ndp"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "natdedproofs",
+				"scopeName": "source.natdedproofs",
+				"path": "./syntaxes/natdedproofs.tmLanguage.json"
+			}
+		],
+    "snippets": [
+      {
+        "language": "natdedproofs",
+        "path": "./snippets/snippets.code-snippets"
+      }
+    ]
+  }
+}
