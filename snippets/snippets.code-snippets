@@ -1,0 +1,73 @@
+{
+	"Hypothesis": {
+	"prefix": "Hypothesis",
+	"body": [
+	  "Hypothesis ${1:hypothesis}"
+	],
+	"description": "Hypothesis"
+  },
+  "Assumption": {
+	"prefix": "Assumption",
+	"body": [
+	  "Assumption"
+	],
+	"description": "assumption"
+  },
+  "By":{
+    "prefix": "by ",
+    "body": [
+      "by ${1:rule}, using {${2:hypothesis}:${3:label}}"
+    ],
+    "description": "okay"
+  },
+  "Theorem":{
+    "prefix": "Theorem",
+      "body": [
+        "${1:thm_name}: h1 : ${2:hypothesis} |- ${3:inference}"
+      ],
+      "description": "theorem"
+  },
+  "Prove":{
+	"prefix": "Prove",
+    "body": [
+      "Prove ${1:thm_name}: h1 : ${2:hypothesis} |- ${3:inference}"
+    ],
+    "description": "ques"
+  },
+  "Admit":{
+	"prefix": "Admit ",
+    "body": [
+      "Admit ${1:thm_name}: h1 : ${2:hypothesis} |- ${3:inference}"
+    ],
+    "description": "admit"
+  },
+  "Qed": {
+    "prefix": "Qed",
+    "body": [
+       "Qed"
+    ],
+    "description": "okay"
+    },
+  "Rules": {
+    "prefix": "Admit rules",
+    "body": [
+      "Admit ~E: h1: (~~p) |- p \nAdmit ~I: h1: p, h2: q, h3: (~q) |- (~p) \nAdmit &E: h1: (p&q) |- p \nAdmit &I: h1: p, h2: q |- (p&q) \nAdmit |E: h1: (p|q), h2: (p>r), h3: (q>r) |- r \nAdmit |I: h1: p |- (p|q) \nAdmit >E: h1: (p>q), h2: p |- q \nAdmit >I: h1: p, h2: q |- (p>q) \nAdmit <>E: h1: (p<>q) |- (p>q) \nAdmit <>I: h1: (p>q), h2: (q>p) |- (p<>q)"
+    ],
+    "description": "okay"
+  },
+  "For_All": {
+    "prefix": "forall",
+    "body": [
+        "∀"
+    ],
+    "description": "okay"
+  },
+  "There_Exists": {
+    "prefix": "thereexists",
+    "body": [
+        "∃"
+    ],
+    "description": "okay"
+  },
+  
+}

@@ -19,7 +19,13 @@ assign_list     : assign_list COMMA VAR COLON VAR | VAR COLON VAR
 ________________________________
 
 expr            : NOT expr | expr OR expr | expr AND expr | expr THEN expr | expr IFF expr 
-                | predicate | ROUND_OPEN expr ROUND_CLOSE
+                | VAR | ROUND_OPEN expr ROUND_CLOSE
+
+
+
+
+
+
 
 predicate       : VAR
                 | VAR ROUND_OPEN var_list ROUND_OPEN

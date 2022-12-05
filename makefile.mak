@@ -1,3 +1,4 @@
-compile:
-	python ./parser.py $(file)
-	python ./lexer.py
+run:
+	pip install sly
+	python ndp_parser.py $(filter-out $@, $(MAKECMDGOALS))
+	

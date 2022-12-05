@@ -1,28 +1,33 @@
-Admit ~E: h1: (~~p) |- p
+Admit ~E: h1: (~~p) |- p 
 Admit ~I: h1: p, h2: q, h3: (~q) |- (~p) 
 Admit &E: h1: (p&q) |- p 
-Admit &I: h1: p, h2: q |- (p&q)
-Admit |E: h1: (p|q), h2: (p>r), h3: (q>r) |- r
-Admit |I: h1: p |- (p|q)
+Admit &I: h1: p, h2: q |- (p&q) 
+Admit |E: h1: (p|q), h2: (p>r), h3: (q>r) |- r 
+Admit |I: h1: p |- (p|q) 
 Admit >E: h1: (p>q), h2: p |- q 
-Admit >I: h1: p, h2: q |- (p>q)
-Admit <>E: h1: (p<>q) |- (p>q)
+Admit >I: h1: p, h2: q |- (p>q) 
+Admit <>E: h1: (p<>q) |- (p>q) 
 Admit <>I: h1: (p>q), h2: (q>p) |- (p<>q)
 
-Prove T0: |- (~~p) > p
-1 - (~~p) [Assumption]
-2 - p [by ~E, using {h1: 1}]
-3 (~~p) > p [by >I, using {h1: 1, h2: 2}]
+// A basic example
+Prove T0: hypo1: q |- (p>q)
+1 q         [Hypothesis hypo1]
+2 - p       [Assumption]
+3 p > q     [by >I, using {h1: 2, h2: 1}]
+// 4 q | p     [by |I, using {h1:1}]             // Check for correct inference
 Qed
 
-Prove T100: |- (~~p) > p
-1 - (~~p) [Assumption]
+// Using a previously derived theorem
+Prove T5: h1: (a<>b) |- (c>d) > (a<>b)
+1 (a<>b)        [Hypothesis h1]
+2 (c>d)>(a<>b)  [by T0, using {hypo1:1}]
+Qed
 
-
-Prove T1: h1: q |- (p>q)
-1 q [Hypothesis h1]
-2 - p [Assumption]
-3 p > q [by >I, using {h1: 2, h2: 1}]
+// Theorem with no hypothesis
+Prove T1: |- (~~p) > p
+1 - (~~p)   [Assumption]
+2 - p       [by ~E, using {h1: 1}]
+3 (~~p) > p [by >I, using {h1: 1, h2: 2}]
 Qed
 
 Prove T2: x1: p, x2: ~q |- ~(p>q)
@@ -42,47 +47,46 @@ Prove T3: h1: ~p |- p>q
 6 p > q [by >I, using {h1: 1, h2: 5}]
 Qed
 
+// Using complex expressions directly in place of symbols from rules
 Prove T4: h1: (a<>b), h2: (a<>b)>(c>p) |- (c>p)
-1 (a<>b)>(c>p) [Hypothesis h2]
-2 (a<>b) [Hypothesis h1]
-3 (c>p) [by >E, using {h2: 2, h1: 1}]
+1 (a<>b)>(c>p)  [Hypothesis h2]
+2 (a<>b)        [Hypothesis h1]
+3 (c>p)         [by >E, using {h2: 2, h1: 1}]
 Qed
-
-Admit T5: |- ∀x ∀y (R(x,y) > R(y,x))
-Prove T6: |- R(2,3) > R(3,2)
-1 R(2,3) [Assumption]
-2 R(2,3) > R(3,2) [by T5, using x <- 2, y <- 3]
-
-
 
 // Not properly formatted:
 
-Prove T5: h1: 
-1 f > s [Hypothesis]
-2 r > !s [Hypothesis]
-3 - r [Assumption]
-4 - !s [by >E ,using {2,3}]
-5 - f [Assumption]
-6 -- s [by >E,using {1,5}]
-7 - !f [by ~I,using {4,5,6},cancel 5]
-8 r>!f [by >I,using {3,7},cancel 3]
+// Admit T5: |- ∀x ∀y (R(x,y) > R(y,x))
+// Prove T6: |- R(2,3) > R(3,2)
+// 1 R(2,3) [Assumption]
+// 2 R(2,3) > R(3,2) [by T5, using x <- 2, y <- 3]
+
+// Prove T5: h1: 
+// 1 f > s [Hypothesis]
+// 2 r > !s [Hypothesis]
+// 3 - r [Assumption]
+// 4 - !s [by >E ,using {2,3}]
+// 5 - f [Assumption]
+// 6 -- s [by >E,using {1,5}]
+// 7 - !f [by ~I,using {4,5,6},cancel 5]
+// 8 r>!f [by >I,using {3,7},cancel 3]
 
 
-1 A [Hypothesis]
-3 - r [Assumption]
-4 - !s [by >E ,using {2,3}]
-5 - f [Assumption]
-6 -- s [by >E,using {1,5}]
-7 - !f [by ~I,using {4,5,6},cancel 5]
-8 r>!f [by >I,using {3,7},cancel 3]
-Qed
+// 1 A [Hypothesis]
+// 3 - r [Assumption]
+// 4 - !s [by >E ,using {2,3}]
+// 5 - f [Assumption]
+// 6 -- s [by >E,using {1,5}]
+// 7 - !f [by ~I,using {4,5,6},cancel 5]
+// 8 r>!f [by >I,using {3,7},cancel 3]
+// Qed
 
-Theorem T1: h1 : A, h2 : B |- A & B.
-Proof.
-3 - r [Assumption]
-4 - !s [by >E ,using {2,3}]
-5 - f [Assumption]
-6 -- s [by >E,using {1,5}]
-7 - !f [by ~I,using {4,5,6},cancel 5]
-8 r>!f [by >I,using {3,7},cancel 3]
-Qed.
+// Theorem T1: h1 : A, h2 : B |- A & B.
+// Proof.
+// 3 - r [Assumption]
+// 4 - !s [by >E ,using {2,3}]
+// 5 - f [Assumption]
+// 6 -- s [by >E,using {1,5}]
+// 7 - !f [by ~I,using {4,5,6},cancel 5]
+// 8 r>!f [by >I,using {3,7},cancel 3]
+// Qed.
