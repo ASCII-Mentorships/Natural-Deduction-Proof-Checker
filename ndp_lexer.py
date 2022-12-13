@@ -1,6 +1,6 @@
 from sly import Lexer
 
-class proofChecker(Lexer):
+class NDPLexer(Lexer):
     
     # Set of token names.   
     tokens = {COMMA, VAR, COMMENT, EOL, ROUND_OPEN, ROUND_CLOSE, CURLY_OPEN, CURLY_CLOSE, SQUARE_OPEN, SQUARE_CLOSE, NOT, OR, AND, THEN, IFF, SCOPE, RULE, BY, USING, ASSN, HYPO, QED, COLON, INFERS, PROVE, ADMIT}
